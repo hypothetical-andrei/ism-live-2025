@@ -1,0 +1,2 @@
+CREATE USER 'user1'@'localhost' IDENTIFIED BY 'ism';
+select user from mysql.user;

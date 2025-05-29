@@ -1,0 +1,5 @@
+ALTER TABLE users
+DROP COLUMN name,
+ADD COLUMN username VARCHAR(255) NOT NULL AFTER id;
+
+DESCRIBE users;

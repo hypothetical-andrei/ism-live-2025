@@ -1,0 +1,30 @@
+courses have many enrolled students
+a teacher can hold many courses
+a student can be enrolled in multiple courses
+a course has many activities
+a location has many timeslots
+an activity takes place in a location at a particular time slot in a particular day
+
+course ->* students
+course ->* activity
+teacher ->* courses
+student ->* enrollments
+course ->* enrollments
+location ->* time_slot
+
+user(id, name, type)
+
+student(id, name, email, phone, user_id)
+teacher(id, name, email, phone, user_id)
+
+course(id, name, description, max_activities)
+
+course_edition(id, description, start_date, course_id)
+
+enrollment(id, student_id, course_id)
+
+location(id, description)
+
+time_slot(id, start_time, end_time, location_id)
+
+activity(id, description, course_edition_id, time_slot_id)

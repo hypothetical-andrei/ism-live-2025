@@ -1,0 +1,2 @@
+create user 'user3'@'localhost' identified by 'ism';
+drop user 'user3'@'localhost';

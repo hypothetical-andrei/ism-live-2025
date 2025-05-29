@@ -1,0 +1,7 @@
+create table ism_passwords1 (
+	id int not null,
+	pass varchar(50),
+	hash_value varbinary(512)
+) engine=InnoDB;
+
+insert into ism_passwords1 (id, pass, hash_value) values (1, 'somepass', sha2('somepass', 512))

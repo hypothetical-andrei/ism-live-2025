@@ -1,0 +1,1 @@
+insert into users (username, type) values ('andrei', 'TEACHER');

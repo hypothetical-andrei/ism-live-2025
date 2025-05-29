@@ -1,0 +1,4 @@
+revoke insert on role_examples.* from 'user1'@'localhost';
+show grants for `user1`@`localhost`;
+revoke create, update on role_examples.* from 'user1'@'localhost';
+insert into stuff (content) values ('something');

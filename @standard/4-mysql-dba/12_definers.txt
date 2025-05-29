@@ -1,0 +1,35 @@
+insert into only_read (content) values ('a'), ('b'), ('c');
+
+delimiter //
+create procedure hello ()
+    begin
+        select 'Hello' AS '** DEBUG:';
+    end //
+delimiter ;
+
+
+delimiter //
+CREATE DEFINER = 'root'@'localhost' PROCEDURE drop_by_id_definer()
+SQL SECURITY DEFINER
+BEGIN
+    delete from role_examples.only_read where id = target;
+END //
+delimiter ;
+
+delimiter //
+create definer='root'@'localhost' procedure drop_by_id_definer (in target int)
+sql security definer
+begin
+    delete from role_examples.only_read where id = target;
+end //
+delimiter ;
+
+delimiter //
+create definer='root'@'localhost' procedure drop_by_id_invoker (in target int)
+sql security invoker
+begin
+    delete from role_examples.only_read where id = target;
+end //
+delimiter ;
+
+grant execute on role_examples.* to 'webapp'@'%';

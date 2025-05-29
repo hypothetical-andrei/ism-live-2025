@@ -1,0 +1,1 @@
+insert into stuff (content) values ('something');

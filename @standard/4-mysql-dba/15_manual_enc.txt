@@ -1,0 +1,30 @@
+create table ism_passwords (
+	id int not null,
+	pass varchar(50),
+	encpass varbinary(50)
+) engine=InnoDB;
+
+delimiter $$
+drop function if exists encpassword $$
+create function encpassword (s varbinary(50), enc_key varchar(10)) returns varbinary(50) deterministic
+begin
+return aes_encrypt(s, enc_key);
+end$$
+delimiter ;
+
+
+delimiter $$
+drop function if exists decpassword $$
+create function decpassword (s varbinary(50), enc_key varchar(10)) returns varbinary(50) deterministic
+begin
+return aes_decrypt(s, enc_key);
+end$$
+delimiter ;
+
+insert into ism_passwords (id, pass, encpass) values (1,'somepass',encpassword('somepass', 'somekey'));
+
+create trigger ins_enc before insert on ism_passwords for each row set new.encpass = encpassword(new.encpass, 'somekey');
+
+insert into ism_passwords (id, pass, encpass) values (1,'somepass','somepass');
+
+select convert(decpassword(encpass, 'somekey'), char(50)) from ism_passwords;

@@ -1,0 +1,2 @@
+SHOW GRANTS FOR 'user1'@'localhost';
+revoke all privileges on 'role_examples'.* from 'user1'@'localhost';

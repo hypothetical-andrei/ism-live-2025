@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_ssl
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./certs:/certs
+    command: >
+      --ssl-ca=/certs/ca.pem
+      --ssl-cert=/certs/server-cert.pem
+      --ssl-key=/certs/server-key.pem
+      --require_secure_transport=ON
+    ports:
+      - "3306:3306"

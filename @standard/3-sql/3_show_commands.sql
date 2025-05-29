@@ -1,0 +1,4 @@
+SHOW DATABASES;
+USE midgard;
+SHOW TABLES;
+DESCRIBE student;
