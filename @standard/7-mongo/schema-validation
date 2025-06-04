@@ -1,0 +1,63 @@
+// 1. Create collection with schema validation
+db.createCollection("users", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "email"],
+      properties: {
+        name: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        email: {
+          bsonType: "string",
+          pattern: "^.+@.+\\..+$",
+          description: "must be a valid email and is required"
+        },
+        age: {
+          bsonType: "int",
+          minimum: 0,
+          description: "must be a non-negative integer if present"
+        },
+        roles: {
+          bsonType: "array",
+          items: {
+            bsonType: "string"
+          },
+          description: "must be an array of strings"
+        }
+      }
+    }
+  },
+  validationLevel: "strict",
+  validationAction: "error"
+});
+
+db.users.insertOne({
+  name: "Alice",
+  email: "alice@example.com",
+  age: 30,
+  roles: ["admin", "editor"]
+});
+
+db.runCommand({
+  collMod: "users",
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "email"],
+      properties: {
+        name: { bsonType: "string" },
+        email: { bsonType: "string", pattern: "^.+@.+\\..+$" },
+        age: { bsonType: "int", minimum: 0 },
+        roles: {
+          bsonType: "array",
+          items: { bsonType: "string" }
+        },
+        isActive: { bsonType: "bool" }  // added field
+      }
+    }
+  },
+  validationLevel: "strict",
+  validationAction: "error"
+});

@@ -1,0 +1,24 @@
+db.employees.insertMany([
+  { name: "Alice", role: "Developer", seniority: "Junior", salary: 55000 },
+  { name: "Bob", role: "Developer", seniority: "Senior", salary: 85000 },
+  { name: "Charlie", role: "Designer", seniority: "Mid", salary: 60000 },
+  { name: "Diana", role: "Developer", seniority: "Mid", salary: 70000 },
+  { name: "Eve", role: "QA Engineer", seniority: "Senior", salary: 75000 }
+]);
+
+db.employees.aggregate([
+  {
+    $group: {
+      _id: { role: "$role", seniority: "$seniority" },
+      averageSalary: { $avg: "$salary" }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      role: "$_id.role",
+      seniority: "$_id.seniority",
+      averageSalary: 1
+    }
+  }
+]);

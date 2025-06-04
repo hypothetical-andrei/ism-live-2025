@@ -1,0 +1,20 @@
+use ism
+
+var items = [0,1,2,3,4,5,6,7,8,9].map(function(e){
+	return {
+		name : 'employee' + e,
+		salary : e * 500
+	}
+})
+
+db.employees.insertMany(items)
+
+var employeeMap = function(){
+	emit("all", this.salary)
+}
+
+var employeeReduce = function (key, values){
+	return Array.avg(values)
+}
+
+db.employees.mapReduce(employeeMap, employeeReduce, {out : "mapreduceOut"})

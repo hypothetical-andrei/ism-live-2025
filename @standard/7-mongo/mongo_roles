@@ -1,0 +1,79 @@
+./mongod --dbpath f:\ism_temp\data0
+
+mongo
+
+use admin
+db.createUser(
+  {
+    user: "someadmin",
+    pwd: "somepass",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+  }
+)
+
+./mongod --dbpath f:\ism_temp\data0 --auth
+
+use admin
+db.auth("someadmin", "somepass" )
+
+./mongo -u "someadmin" -p "somepass" --authenticationDatabase "admin"
+
+use admin
+
+# https://docs.mongodb.com/manual/reference/privilege-actions/#query-and-write-actions
+
+use ism
+db.createUser(
+  {
+    user: "genericuser",
+    pwd: "genericpass",
+    roles: [ { role: "readWrite", db: "ism" }]
+  }
+)
+
+./mongo -u genericuser -p genericpass --authenticationDatabase ism
+./mongo -u genericuser -p genericpass --authenticationDatabase test123
+
+./mongo -u "someadmin" -p "somepass" --authenticationDatabase "admin"
+
+use admin
+
+use ismwrite
+
+db.createRole(
+   {
+     role: "ismstuff",
+     privileges: [
+       { resource: { db: "ismwrite", collection: "stuff" }, actions: [ "insert", "find" ] }
+     ],
+     roles: []
+   }
+)
+
+db.createUser(
+  {
+    user: "someuser",
+    pwd: "somepass",
+    roles : [{ role: "readWrite", db: "ismwrite" },
+      { role: "read", db: "ismread" }]
+})
+
+
+db.revokeRolesFromUser(
+    "someuser",
+    [
+      { role: "readWrite", db: "ismwrite" },
+      { role: "read", db: "ismread" }
+    ]
+)
+
+db.grantRolesToUser(
+    "someuser",
+    [
+      { role: "ismstuff", db: "ismwrite" }
+    ]
+)
+
+db.getRole( "ismstuff", { showPrivileges: true } )
+
+db.otherstuff.insert({a : 1})

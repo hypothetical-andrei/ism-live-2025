@@ -1,0 +1,71 @@
+$host.ui.RawUI.WindowTitle = “Changed Title”
+
+
+./mongod --configsvr --replSet config_set --dbpath f:\ism_temp\sharded\config0 --bind_ip localhost --port 27019
+./mongod --configsvr --replSet config_set --dbpath f:\ism_temp\sharded\config1 --bind_ip localhost --port 27020
+./mongod --configsvr --replSet config_set --dbpath f:\ism_temp\sharded\config2 --bind_ip localhost --port 27021
+
+./mongo --host localhost --port 27019
+
+
+
+rs.initiate(
+  {
+    _id: "config_set",
+    configsvr: true,
+    members: [
+      { _id : 0, host : "localhost:27019" },
+      { _id : 1, host : "localhost:27020" },
+      { _id : 2, host : "localhost:27021" }
+    ]
+  }
+)
+
+./mongod --shardsvr --replSet data_set0  --dbpath f:\ism_temp\sharded\data0 --bind_ip localhost --port 27022
+
+./mongod --shardsvr --replSet data_set0  --dbpath f:\ism_temp\sharded\data1 --bind_ip localhost --port 27023
+
+./mongo --host localhost --port 27022
+
+rs.initiate(
+  {
+    _id : "data_set0",
+    members: [
+        { _id : 0, host : "localhost:27022" },
+      { _id : 1, host : "localhost:27023" }
+    ]
+  }
+)
+
+./mongos --configdb config_set/localhost:27019 --port 27025
+
+./mongo --host localhost --port 27025
+
+sh.addShard('data_set/localhost:27022')
+sh.addShard('data_set/localhost:27023')
+
+sh.enableSharding('sharding_test')
+
+sh.shardCollection("sharding_test.students", {_id : 1})
+
+./mongod --shardsvr --replSet data_set1  --dbpath f:\ism_temp\sharded\data2 --bind_ip localhost --port 27026
+
+./mongod --shardsvr --replSet data_set1  --dbpath f:\ism_temp\sharded\data3 --bind_ip localhost --port 27027
+
+./mongo --host localhost --port 27026
+
+rs.initiate(
+  {
+    _id : "data_set1",
+    members: [
+        { _id : 0, host : "localhost:27026" },
+      { _id : 1, host : "localhost:27027" }
+    ]
+  }
+)
+
+./mongo --host localhost --port 27025
+
+
+sh.addShard('data_set1/localhost:27026')
+sh.addShard('data_set1/localhost:27027')

@@ -1,0 +1,123 @@
+
+
+
+
+var items = [0,1,2,3,4,5,6,7,8,9].map(function(e){return {name : 'e'+e, student_number : '000' + e}})
+
+for (var i = 0; i < items.length; i++){
+	db.students.insert(items[i])
+}
+
+db.students.find().map(function(e){
+	return e._id
+})
+
+// [
+//         ObjectId("5c721ec5d2865e45db464a60"),
+//         ObjectId("5c721ec5d2865e45db464a61"),
+//         ObjectId("5c721ec5d2865e45db464a62"),
+//         ObjectId("5c721ec5d2865e45db464a63"),
+//         ObjectId("5c721ec5d2865e45db464a64"),
+//         ObjectId("5c721ec5d2865e45db464a65"),
+//         ObjectId("5c721ec5d2865e45db464a66"),
+//         ObjectId("5c721ec5d2865e45db464a67"),
+//         ObjectId("5c721ec5d2865e45db464a68"),
+//         ObjectId("5c721ec5d2865e45db464a69")
+// ]
+
+
+
+var items = [
+    ObjectId("5c721ec5d2865e45db464a60"),
+    ObjectId("5c721ec5d2865e45db464a61"),
+    ObjectId("5c721ec5d2865e45db464a62"),
+    ObjectId("5c721ec5d2865e45db464a63"),
+    ObjectId("5c721ec5d2865e45db464a64"),
+    ObjectId("5c721ec5d2865e45db464a65"),
+    ObjectId("5c721ec5d2865e45db464a66"),
+    ObjectId("5c721ec5d2865e45db464a67"),
+    ObjectId("5c721ec5d2865e45db464a68"),
+    ObjectId("5c721ec5d2865e45db464a69")
+].map(
+	function(e, i){
+		return {
+			username : 'e'+ i, 
+			type : (i%2?'limited':'full'),
+			details : e
+		}
+	}
+)
+
+for (var i = 0; i < items.length; i++){
+	db.users.insert(items[i])
+}
+
+db.users.find()
+
+db.users.aggregate({
+	$match : {
+		type : 'full'
+	}
+},
+{
+	$lookup : {
+		from : 'students',
+		localField : 'details',
+		foreignField : '_id',
+		as : 'students_detailed'
+	}
+},{
+	$project : {
+		_id : 0,
+		username : 1,
+		type : 1,
+		'students_detailed.name' : 1
+	}
+})
+
+
+
+db.groups.insert({
+	name : 'group1',
+	students : [ ObjectId("5c721ec5d2865e45db464a60"),
+        ObjectId("5c721ec5d2865e45db464a61"),
+        ObjectId("5c721ec5d2865e45db464a62"),
+        ObjectId("5c721ec5d2865e45db464a63"),
+        ObjectId("5c721ec5d2865e45db464a64")]
+})
+
+db.groups.insert({
+	name : 'group2',
+	students : [  ObjectId("5c721ec5d2865e45db464a65"),
+        ObjectId("5c721ec5d2865e45db464a66"),
+        ObjectId("5c721ec5d2865e45db464a67"),
+        ObjectId("5c721ec5d2865e45db464a68"),
+        ObjectId("5c721ec5d2865e45db464a69")]
+})
+
+db.groups.find()
+
+db.groups.aggregate({
+	$lookup : {
+		from : 'students',
+		localField : 'students',
+		foreignField : '_id',
+		as : 'students_full'
+	}
+})
+
+
+db.groups.aggregate({
+	$lookup : {
+		from : 'students',
+		localField : 'students',
+		foreignField : '_id',
+		as : 'students_full'
+	}
+},{
+	$project : {
+		_id : 0,
+		name : 1,
+		'students_full.name' : 1
+	}
+})

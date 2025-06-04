@@ -1,0 +1,21 @@
+use ismtest
+
+var items = [0,1,2,3,4,5,6,7,8,9].map(function(e){return {name : 'e'+e, student_number : '000' + e, grade : _rand() * 10}})
+
+for (var i = 0; i < items.length; i++){
+	db.students.insert(items[i])
+}
+
+var items = [0,1,2,3,4,5,6,7,8,9].map(function(e){return {name : 'e'+e, student_number : '000' + e, grade : _rand() * 10}})
+
+for (var i = 0; i < items.length; i++){
+	db.students.insert(items[i])
+}
+
+var grademap = function() { emit(this.name, this.grade); };
+var gradereduce = function(keyName, values) { return Array.avg(values);};
+db.students.mapReduce(grademap,gradereduce,{ out: "mapreduceout" })
+
+db.mapreduceout.find()
+
+db.students.find({name : 'e0'})

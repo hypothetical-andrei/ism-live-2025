@@ -1,0 +1,8 @@
+
+openssl req -newkey rsa:2048 -new -x509 -days 365 -nodes -out mongodb-cert.crt -keyout mongodb-cert.key
+
+cat mongodb-cert.key mongodb-cert.crt > mongodb-cert.pem
+
+mongod --sslMode requireSSL --sslPEMKeyFile ~/ismtools/certs/mongodb-cert.pem --dbpath ~/ismtools/data/ --port 27020
+
+mongo --ssl --host localhost --sslCAFile ~/ismtools/certs/mongodb-cert.pem --port 27020

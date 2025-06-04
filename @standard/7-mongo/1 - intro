@@ -1,0 +1,370 @@
+var items = [0,1,2,3,4,5,6,7,8,9].map(function(e){
+	return {
+		name : 'student' + e,
+		studentNo : e
+	}
+})
+
+for (var i = 0; i < items.length; i++){
+	db.students.insert(items[i])
+}
+
+var e = {
+	name : 'john',
+	position : 'programmer',
+	salary : 1000
+}
+
+db.employees.insert(e)
+
+e = {
+	name : 'jim',
+	position : 'programmer',
+	salary : 1500
+}
+
+db.employees.insert(e)
+
+e = {
+	name : 'jane',
+	position : 'accountant',
+	salary : 1500
+}
+
+db.employees.insert(e)
+
+db.employees.count()
+
+db.employees.findOne()
+
+db.employees.find().pretty()
+
+db.employees.find({position : 'programmer'})
+
+db.employees.find({
+	position : 'programmer', 
+	salary : {
+		$gt : 1000
+	}
+})
+
+db.employees.find({
+	salary : {
+		$gt : 1000
+	}
+})
+
+db.employees.find({$or : [
+	{
+		position : 'programmer', 
+		salary : {
+			$gt : 1000
+		}
+	},
+	{
+		position : 'accountant'
+	}
+]})
+
+db.employees.find({
+	position : {
+		$in : ['accountant', 'programmer']
+	}
+})
+
+db.students.find().limit(3)
+
+db.students.find().limit(3).skip(5)
+
+db.companies.insert({
+	name : 'acme',
+	address : {
+		street : 'somestreet',
+		number : 3,
+		country : 'us'
+	}
+})
+
+db.companies.insert({
+	name : 'apex',
+	address : {
+		street : 'someotherstreet',
+		number : 4,
+		country : 'us'
+	}
+})
+
+db.companies.find({'address.country' : 'us'})
+
+db.companies.find({'address.country' : 'us'}).explain()
+
+db.companies.ensureIndex({'address.country' : 1})
+
+db.companies.find({'address.country' : 'us'}).explain()
+
+db.students.remove({name : 'student7'})
+
+db.students.update({name : 'student5'}, {name : '55'})
+
+db.students.update({name : 'student6'}, {$set : {
+	name : '66'
+}})
+
+db.students.updateMany({name : 'student6'}, {$set : {
+	name : '66'
+}})
+
+db.employees.updateMany({},{
+	$inc : {salary : 50}
+})
+
+db.employees.remove({})
+
+var items = [0,1,2,3,4,5,6,7,8,9].map(function(e){
+	return {
+		name : 'employee' + e,
+		salary : e * 1000,
+		job : (e % 2 ? 'programmer' : 'accountant')
+	}
+})
+
+for (var i = 0; i < items.length; i++) {
+	db.employees.insert(items[i])
+}
+
+db.employees.aggregate({
+	$project : {
+		_id : 0,
+		salary : 1,
+		job : 1
+	}
+})
+
+db.employees.aggregate({
+	$project : {
+		_id : 0,
+		salary : 1,
+		job : 1
+	}
+}, {
+	$match : {
+		job : 'programmer'
+	}
+})
+
+db.employees.aggregate({
+	$match : {
+		job : 'programmer'
+	}
+},{
+	$project : {
+		_id : 0,
+		salary : 1,
+		job : 1
+	}
+},  {
+	$group : {
+			_id : '$job',
+			avg_salary : {
+				$avg : '$salary'
+			},
+			count : {
+				$sum : 1
+			}
+		}
+	}
+)
+
+var items  = [0,1,2,3,4,5,6,7,8,9].map(function(e){
+	return {
+		name : 'student' + 0,
+		student_number : '000' + e
+	}
+})
+
+for (var i = 0; i < items.length; i++){
+	db.students.insert(items[i])
+}
+
+db.students.find().map(function(e){
+	return e._id
+})
+
+var items = [
+	ObjectId("5c7260d371b10ce8f1c6c106"),
+	ObjectId("5c7260d371b10ce8f1c6c107"),
+	ObjectId("5c7260d371b10ce8f1c6c108"),
+	ObjectId("5c7260d371b10ce8f1c6c109"),
+	ObjectId("5c7260d371b10ce8f1c6c10a"),
+	ObjectId("5c7260d371b10ce8f1c6c10b"),
+	ObjectId("5c7260d371b10ce8f1c6c10c"),
+	ObjectId("5c7260d371b10ce8f1c6c10d"),
+	ObjectId("5c7260d371b10ce8f1c6c10e"),
+	ObjectId("5c7260d371b10ce8f1c6c10f")
+].map(function (e, i){
+	return {
+		username : 'e' + i,
+		type : (i % 2 ? 'limited' : 'full'),
+		details : e
+	}
+})
+
+for (var i = 0; i < items.length; i++){
+	db.users.insert(items[i])
+}
+
+db.users.aggregate({
+	$lookup : {
+		from : 'students',
+		localField : 'details',
+		foreignField : '_id',
+		as : 'user_details'
+	}
+})
+
+db.users.aggregate({
+	$lookup : {
+		from : 'students',
+		localField : 'details',
+		foreignField : '_id',
+		as : 'user_details'
+	}
+}, {
+	$project : {
+		_id : 0,
+		username : 1,
+		type : 1,
+		'user_details.name' : 1
+	}
+})
+
+db.users.aggregate({
+	$match : {
+		type : 'full'
+	}
+},{
+	$lookup : {
+		from : 'students',
+		localField : 'details',
+		foreignField : '_id',
+		as : 'user_details'
+	}
+}, {
+	$project : {
+		_id : 0,
+		username : 1,
+		type : 1,
+		'user_details.name' : 1
+	}
+})
+
+
+db.groups.insert({
+	name : 'group1',
+	students : [
+		ObjectId("5c7260d371b10ce8f1c6c106"),
+		ObjectId("5c7260d371b10ce8f1c6c107"),
+		ObjectId("5c7260d371b10ce8f1c6c108"),
+		ObjectId("5c7260d371b10ce8f1c6c109"),
+	]
+})
+
+db.groups.insert({
+	name : 'group2',
+	students : [
+		ObjectId("5c7260d371b10ce8f1c6c10a"),
+		ObjectId("5c7260d371b10ce8f1c6c10b"),
+		ObjectId("5c7260d371b10ce8f1c6c10c"),
+		ObjectId("5c7260d371b10ce8f1c6c10d"),
+		ObjectId("5c7260d371b10ce8f1c6c10e"),
+		ObjectId("5c7260d371b10ce8f1c6c10f")
+	]
+})
+
+db.groups.aggregate({
+	$lookup : {
+		from : 'students',
+		localField : 'students',
+		foreignField : '_id',
+		as : 'students_full'
+	}
+})
+
+db.groups.aggregate({
+	$lookup : {
+		from : 'students',
+		localField : 'students',
+		foreignField : '_id',
+		as : 'students_full'
+	}
+},{
+	$project : {
+		_id : 0,
+		name : 1,
+		'students_full.name' : 1
+	} 
+})
+
+
+var items = [0,1,2,3,4,5,6,7,8,9].map(function(e){
+	return {
+		name : 'e' + e,
+		student_number : '000' + e,
+		grade : _rand() * 10,
+		type: e % 2 ? 'a' : 'b'
+	}
+})
+
+for (var i = 0; i < items.length; i++){
+	db.students.insert(items[i])
+}
+
+var gradeMap = function (){
+	emit(this.type, this.grade);
+}
+
+var gradeReduce = function(key, values){
+	return Array.avg(values);
+}
+
+db.students.mapReduce(gradeMap, gradeReduce, {
+	out : 'mapReduceOut'
+})
+
+db.places.insert({
+	loc : {
+		type : "Point",
+		coordinates : [
+			-73.97,
+			40.77
+		],
+		name : "Central Park",
+		category : "Parks"
+	}
+})
+
+db.places.insert({
+	loc : {
+		type : "Point",
+		coordinates : [
+			-73.88,
+			40.78
+		],
+		name : "La Guardia Airport",
+		category : "Airport"
+	}
+})
+
+db.places.ensureIndex({loc : "2dsphere"})
+
+db.places.find({
+	loc : {
+		$near : {
+			$geometry : {
+				type : "Point",
+				coordinates : [-73.96, 40.78]
+			},
+			$maxDistance : 5000
+		}
+	}
+})

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./certs:/certs:ro
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    command: >
+      mongod
+      --auth
+      --tlsMode requireTLS
+      --tlsCertificateKeyFile /certs/mongo-combined.pem
+      --tlsCAFile /certs/ca.pem
+      --tlsAllowConnectionsWithoutCertificates
+

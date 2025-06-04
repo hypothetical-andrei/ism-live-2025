@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "joi": "^17.13.3",
+    "mongodb": "^6.16.0"
+  }
+}
