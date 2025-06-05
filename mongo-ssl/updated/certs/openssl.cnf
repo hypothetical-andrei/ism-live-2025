@@ -1,0 +1,81 @@
+# openssl.cnf - OpenSSL configuration file for certificate generation
+
+# Default section for req (certificate request)
+[ req ]
+# Specifies the distinguished name (DN) components to be prompted for, or their default values if prompt is 'no'.
+distinguished_name = req_distinguished_name
+# Specifies the X.509 extensions to use for self-signed certificates (like the CA).
+x509_extensions = v3_ca
+# Set to 'no' to use the default values specified in req_distinguished_name without prompting.
+prompt = no
+
+# Section for distinguished name components
+[ req_distinguished_name ]
+countryName = US
+stateOrProvinceName = CA
+localityName = SanFrancisco
+organizationName = MyOrg
+organizationalUnitName = IT
+# Common Name (CN) is a placeholder here; it will be overridden by scripts.
+commonName = localhost
+
+# X.509 extensions for a Certificate Authority (CA) certificate
+[ v3_ca ]
+# subjectKeyIdentifier: A unique identifier of the public key within the certificate.
+# 'hash' means it's derived from the public key hash.
+subjectKeyIdentifier = hash
+# authorityKeyIdentifier: Identifies the public key of the CA certificate that signed this certificate.
+# 'keyid:always' means it's always included and derived from the CA's public key.
+# 'issuer:always' includes the issuer's distinguished name and serial number.
+authorityKeyIdentifier = keyid:always,issuer:always
+# basicConstraints: Defines if the certificate is a CA or end-entity certificate.
+# 'CA:TRUE' indicates this certificate is a CA certificate, capable of signing other certificates.
+basicConstraints = CA:TRUE
+# keyUsage: Defines the purpose of the public key contained in the certificate.
+# 'critical' means the application MUST understand this extension.
+# 'digitalSignature' allows use for digital signatures.
+# 'cRLSign' allows use for signing Certificate Revocation Lists.
+# 'keyCertSign' allows use for signing other certificates (essential for a CA).
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+# X.509 extensions for server certificates (e.g., MongoDB server)
+[ v3_req_server ]
+# basicConstraints: 'CA:FALSE' indicates this is an end-entity certificate, not a CA.
+basicConstraints = CA:FALSE
+# keyUsage: Defines how the key can be used.
+# 'nonRepudiation' ensures the sender cannot later deny signing.
+# 'digitalSignature' for digital signatures.
+# 'keyEncipherment' for encrypting keys for secure data transfer.
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+# extendedKeyUsage: Specifies additional purposes for which the certified public key may be used.
+# 'serverAuth' means the certificate is valid for authenticating a server.
+# 'clientAuth' means the certificate is valid for authenticating a client (useful for mTLS server certs).
+extendedKeyUsage = serverAuth, clientAuth
+# subjectAltName: Provides alternative names for the subject (e.g., DNS names, IP addresses).
+# Crucial for matching hostnames/IPs during TLS validation.
+subjectAltName = @alt_names_server
+
+# Alternative names for the server certificate
+[ alt_names_server ]
+# DNS.1: Primary DNS hostname.
+DNS.1 = localhost
+# IP.1: Primary IP address.
+IP.1 = 127.0.0.1
+
+# X.509 extensions for client certificates (e.g., Node.js client)
+[ v3_req_client ]
+# basicConstraints: 'CA:FALSE' indicates this is an end-entity certificate.
+basicConstraints = CA:FALSE
+# keyUsage: Same as server, defining key purposes.
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+# extendedKeyUsage: 'clientAuth' means the certificate is valid for authenticating a client.
+extendedKeyUsage = clientAuth
+# subjectAltName: Alternative names for the client certificate.
+subjectAltName = @alt_names_client
+
+# Alternative names for the client certificate
+[ alt_names_client ]
+# DNS.1: Client's DNS hostname.
+DNS.1 = localhost
+# IP.1: Client's IP address.
+IP.1 = 127.0.0.1
